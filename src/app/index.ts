@@ -15,7 +15,7 @@ import { Commands } from '../models/commands';
 export class DiscordApp {
   public axios;
   public client: Client;
-  public commands: Map<string, Commands>;
+  public commands: Map<string, Commands<any>>;
 
   constructor(token: string) {
     this.axios = axios.create({ baseURL: config.AXIOS_BASE_URL });
@@ -28,7 +28,7 @@ export class DiscordApp {
       ]
     });
     this.client.login(token);
-    this.commands = new Map<string, Commands>();
+    this.commands = new Map<string, Commands<any>>();
     this.loadEvents();
     this.loadCommands();
   }

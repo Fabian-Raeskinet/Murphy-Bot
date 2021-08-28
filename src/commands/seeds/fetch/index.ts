@@ -12,7 +12,7 @@ import { Command } from '../..';
 import { CreateGuildDto } from '../../../dtos/guild/create_guild';
 import { CreateGuild } from '../../../services/guild/create_guild';
 
-export default class Fetch extends Command {
+export default class Fetch extends Command<void> {
   name: string = 'fetch';
 
   constructor(app: DiscordApp, allowedUsersCategory) {

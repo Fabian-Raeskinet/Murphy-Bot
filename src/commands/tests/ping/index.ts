@@ -10,7 +10,7 @@ import * as _ from 'lodash';
 //Models
 import { Command } from '../..';
 
-export default class Ping extends Command {
+export default class Ping extends Command<void> {
   name: string = 'ping';
 
   constructor(client: DiscordApp, allowedUsersCategory) {
