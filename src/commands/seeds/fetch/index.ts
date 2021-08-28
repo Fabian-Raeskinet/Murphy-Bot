@@ -6,15 +6,18 @@ import { Interaction, InteractionReplyOptions } from 'discord.js';
 
 //Externals
 import * as _ from 'lodash';
+import { v4 as uuid } from 'uuid';
 
 //Models
 import { Command } from '../..';
 import { CreateGuildDto } from '../../../dtos/guild/create_guild';
 import { CreateUserDto } from '../../../dtos/user/create_user';
+import { CreateGuildMemberDto } from '../../../dtos/guild_member/create_guild_member';
 
 //Services
-import { CreateGuild } from '../../../services/guild/create_guild';
-import { CreateUser } from '../../../services/user/create_user';
+import { CreateGuild } from '../../../services/guilds/create_guild';
+import { CreateUser } from '../../../services/users/create_user';
+import { CreateGuildMember } from '../../../services/guild_members/create_guild_member';
 
 export default class Fetch extends Command<void> {
   name: string = 'fetch';
@@ -72,6 +75,20 @@ export default class Fetch extends Command<void> {
             IsBot: user.bot
           };
           await this.saveUser(createUserDto);
+
+          const createGuildMemberDto: CreateGuildMemberDto = {
+            GuildMemberId: uuid(),
+            UserId: user.id,
+            GuildId: guild.id,
+            Nickname: member.nickname,
+            JoinedAt: member.joinedAt,
+            IsAdmin: member.permissions.has('ADMINISTRATOR'),
+            IsAvailable: true,
+            IsBanned: false,
+            IsKicked: false
+          };
+
+          this.saveGuildMember(createGuildMemberDto);
         });
       });
 
@@ -92,6 +109,14 @@ export default class Fetch extends Command<void> {
   async saveUser(params: CreateUserDto) {
     try {
       const response = await new CreateUser().execute(params);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async saveGuildMember(params: CreateGuildMemberDto) {
+    try {
+      const response = await new CreateGuildMember().execute(params);
     } catch (error) {
       console.error(error);
     }
