@@ -56,7 +56,8 @@ export default class Fetch extends Command {
       console.log(createGuildDto);
 
       try {
-        const response = await CreateGuild(createGuildDto);
+        const service = new CreateGuild();
+        const response = await service.execute(createGuildDto);
       } catch (error) {
         console.error(error);
       }
