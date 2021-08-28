@@ -1,5 +1,6 @@
-import axios, { AxiosResponse } from 'axios';
 import { Service } from '../..';
+
+//Models
 import { CreateGuildDto } from '../../../dtos/guild/create_guild';
 
 export class CreateGuild extends Service<CreateGuildDto, boolean> {
