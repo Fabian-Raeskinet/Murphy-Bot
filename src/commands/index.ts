@@ -13,7 +13,7 @@ import { Commands } from '../models/commands';
 //Config
 import * as config from '../config';
 
-export abstract class Command implements Commands {
+export abstract class Command<T> implements Commands<T> {
   aliases: string[];
   allowedUsersCategory: string[];
   app: DiscordApp;
@@ -31,7 +31,7 @@ export abstract class Command implements Commands {
     this.necessaryPermissions = [];
   }
 
-  abstract execute(params: Interaction): Promise<void>;
+  abstract execute(params: Interaction): Promise<T>;
 
   isAllowed(interaction: Interaction): boolean {
     if (this.isAdministratorCommand && interaction.user.id === config.ADMINISTRATOR_ID) return true;
