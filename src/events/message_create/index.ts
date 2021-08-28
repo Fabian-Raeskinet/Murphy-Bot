@@ -7,7 +7,7 @@ import { Message } from 'discord.js';
 //Models
 import { Event } from '../../models/event';
 
-export default class MessageCreate implements Event {
+export default class MessageCreate implements Event<void> {
   app: DiscordApp;
   name: string = 'messageCreate';
 

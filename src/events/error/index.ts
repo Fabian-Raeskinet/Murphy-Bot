@@ -2,7 +2,7 @@
 import { DiscordApp } from '../../app';
 import { Event } from '../../models/event';
 
-export default class Error implements Event {
+export default class Error implements Event<void> {
   app: DiscordApp;
   name: string = 'error';
 

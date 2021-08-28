@@ -7,7 +7,7 @@ import { ApplicationCommandData, Client } from 'discord.js';
 //Models
 import { Event } from '../../models/event';
 
-export default class Ready implements Event {
+export default class Ready implements Event<void> {
   app: DiscordApp;
   name: string = 'ready';
 

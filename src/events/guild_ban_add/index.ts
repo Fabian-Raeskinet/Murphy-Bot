@@ -7,7 +7,7 @@ import { GuildBan } from 'discord.js';
 //Models
 import { Event } from '../../models/event';
 
-export default class GuildBanAdd implements Event {
+export default class GuildBanAdd implements Event<void> {
   app: DiscordApp;
   name: string = 'guildBanAdd';
 

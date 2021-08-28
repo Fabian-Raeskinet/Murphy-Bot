@@ -1,8 +1,8 @@
 //Client
 import { DiscordApp } from '../../app';
 
-export interface Event {
+export interface Event<T> {
   app: DiscordApp;
   name: string;
-  run: (params: any) => Promise<void>;
+  run: (params: any) => Promise<T>;
 }

@@ -8,7 +8,7 @@ import { Interaction } from 'discord.js';
 import { Event } from '../../models/event';
 import { Commands } from '../../models/commands';
 
-export default class InteractionCreate implements Event {
+export default class InteractionCreate implements Event<void> {
   app: DiscordApp;
   name: string = 'interactionCreate';
 
