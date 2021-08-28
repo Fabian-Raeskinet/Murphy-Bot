@@ -1,0 +1,34 @@
+{
+  "name": "Murphy",
+  "version": "1.0.0",
+  "description": "A discord bot",
+  "main": "index.js",
+  "author": "Fabian Raeskinet",
+  "license": "MIT",
+  "scripts": {
+    "build:gulp": "gulp build",
+    "watch:gulp": "gulp watch",
+    "start:gulp": "gulp start",
+    "watch": "npm run watch:gulp -s",
+    "build": "npm run build:gulp -s",
+    "start": "npm run start:gulp -s"
+  },
+  "repository": "https://github.com/Fabian-Raeskinet/Le-Bot-Etudiant.git",
+  "devDependencies": {
+    "@types/node": "^14.0.22",
+    "del": "^5.1.0",
+    "gulp": "^4.0.2",
+    "gulp-nodemon": "^2.5.0",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-typescript": "^6.0.0-alpha.1",
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.172",
+    "axios": "^0.21.1",
+    "discord.js": "^13.1.0",
+    "global": "^4.4.0",
+    "gulp-cli": "^2.3.0",
+    "lodash": "^4.17.21"
+  }
+}
