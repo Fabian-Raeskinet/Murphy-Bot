@@ -17,7 +17,7 @@ export default class Ready implements Event {
 
   public async run(client: Client): Promise<void> {
     try {
-      console.log('-------READY-------');
+      console.log('\n-------READY-------');
 
       console.log('Bot ready !');
 

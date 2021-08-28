@@ -6,6 +6,7 @@ import { Interaction } from 'discord.js';
 
 //Models
 import { Event } from '../../models/event';
+import { Commands } from '../../models/commands';
 
 export default class InteractionCreate implements Event {
   app: DiscordApp;
@@ -18,7 +19,7 @@ export default class InteractionCreate implements Event {
   public async run(interaction: Interaction): Promise<void> {
     try {
       if (!interaction.isCommand()) return;
-      const command = this.app.commands.get(interaction.commandName);
+      const command: Commands<any> = this.app.commands.get(interaction.commandName);
 
       if (!command) return;
 

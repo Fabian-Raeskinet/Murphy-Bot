@@ -29,14 +29,13 @@ export class DiscordApp {
     });
     this.client.login(token);
     this.commands = new Map<string, Commands<any>>();
-    this.loadEvents();
-    this.loadCommands();
+    this.initialisation();
   }
 
   private async loadEvents(rootDir = join(__dirname, '../events')) {
-    console.log('-------EVENTS-------');
+    console.log('\n-------EVENTS-------');
 
-    readdirSync(rootDir).forEach(async (dir) => {
+    for (const dir of readdirSync(rootDir)) {
       const loadClass = await import(`${rootDir}/${dir}`);
 
       const currentClass = loadClass.default;
@@ -45,15 +44,14 @@ export class DiscordApp {
       this.client.on(evt.name, (...args) => evt.run(...args));
 
       console.log(`Event loaded: ${evt.name}`);
-    });
+    }
   }
 
   private async loadCommands(rootDir = join(__dirname, '../commands')) {
-    console.log('-------COMMANDS-------');
-    readdirSync(rootDir).forEach(async (dirs) => {
+    console.log('\n-------COMMANDS-------');
+    for (const dirs of readdirSync(rootDir)) {
       if (!dirs.endsWith('.js')) {
         const commands = readdirSync(`${rootDir}/${dirs}/`);
-        console.log('command', commands);
 
         for (const file of commands) {
           const loadClass = await import(`${rootDir}/${dirs}/${file}`);
@@ -63,6 +61,11 @@ export class DiscordApp {
           console.log(`Command loaded: ${command.name}`);
         }
       }
-    });
+    }
+  }
+
+  private async initialisation() {
+    await this.loadEvents();
+    await this.loadCommands();
   }
 }
