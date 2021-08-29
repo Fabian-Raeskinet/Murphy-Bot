@@ -2,7 +2,7 @@
 import * as config from '../config';
 
 //Discord
-import { Client, Intents } from 'discord.js';
+import { Client, ClientOptions, Intents } from 'discord.js';
 
 //Externals
 import axios from 'axios';
@@ -13,23 +13,19 @@ import { join } from 'path';
 import { Commands } from '../models/commands';
 
 export class DiscordApp {
-  public axios;
   public client: Client;
   public commands: Map<string, Commands<any>>;
 
-  constructor(token: string) {
-    this.axios = axios.create({ baseURL: config.AXIOS_BASE_URL });
-    this.client = new Client({
-      intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MEMBERS,
-        Intents.FLAGS.GUILD_PRESENCES
-      ]
-    });
+  constructor(token: string, clientOptions: ClientOptions) {
+    this.client = new Client(clientOptions);
     this.client.login(token);
     this.commands = new Map<string, Commands<any>>();
     this.initialisation();
+  }
+
+  private async initialisation() {
+    await this.loadEvents();
+    await this.loadCommands();
   }
 
   private async loadEvents(rootDir = join(__dirname, '../events')) {
@@ -62,10 +58,5 @@ export class DiscordApp {
         }
       }
     }
-  }
-
-  private async initialisation() {
-    await this.loadEvents();
-    await this.loadCommands();
   }
 }
