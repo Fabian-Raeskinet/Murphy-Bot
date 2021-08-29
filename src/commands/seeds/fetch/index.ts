@@ -14,12 +14,14 @@ import { CreateGuildDto } from '../../../dtos/guild/create_guild';
 import { CreateUserDto } from '../../../dtos/user/create_user';
 import { CreateGuildMemberDto } from '../../../dtos/guild_member/create_guild_member';
 import { CreateRoleDto } from '../../../dtos/role/create_role';
+import { CreateCategoryChannelDto } from '../../../dtos/category_channel/create_category_channel';
 
 //Services
 import { CreateGuild } from '../../../services/guilds/create_guild';
 import { CreateUser } from '../../../services/users/create_user';
 import { CreateGuildMember } from '../../../services/guild_members/create_guild_member';
 import { CreateRole } from '../../../services/roles/create_role';
+import { CreateCategoryChannel } from '../../../services/category_channels/create_category_channel';
 
 export default class Fetch extends Command<void> {
   name: string = 'fetch';
@@ -96,7 +98,6 @@ export default class Fetch extends Command<void> {
 
         const rolesCollection = await guild.roles.fetch();
         const roles = _.orderBy(Array.from(rolesCollection.values()), ['position'], 'desc');
-        console.log(roles);
 
         _.each(roles, async (role) => {
           const createRoleDto: CreateRoleDto = {
@@ -105,10 +106,26 @@ export default class Fetch extends Command<void> {
             Color: role.hexColor,
             Position: role.position,
             CreatedAt: role.createdAt,
-            MemberRoleCount: role.members.size
+            MemberRoleCount: role.members.size,
+            GuildId: guild.id
           };
 
           await this.saveRole(createRoleDto);
+        });
+
+        const channelsCollection = await guild.channels.fetch();
+        const categoryChannels = _.filter(Array.from(channelsCollection.values()), (c) => c.type === 'GUILD_CATEGORY');
+
+        _.each(categoryChannels, (categoryChannel) => {
+          const createCategoryChannelDto: CreateCategoryChannelDto = {
+            CategoryChannelId: categoryChannel.id,
+            Name: categoryChannel.name,
+            Position: categoryChannel.position,
+            CreatedAt: categoryChannel.createdAt,
+            GuildId: guild.id
+          };
+
+          this.saveCategoryChannel(createCategoryChannelDto);
         });
       });
 
@@ -148,5 +165,11 @@ export default class Fetch extends Command<void> {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  async saveCategoryChannel(params: CreateCategoryChannelDto) {
+    try {
+      const response = await new CreateCategoryChannel().execute(params);
+    } catch (error) {}
   }
 }

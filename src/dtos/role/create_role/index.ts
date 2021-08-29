@@ -4,5 +4,6 @@ export interface CreateRoleDto {
   Color: string;
   CreatedAt: Date;
   Position: number;
-  MemberRoleCount: number
+  MemberRoleCount: number;
+  GuildId: string;
 }
