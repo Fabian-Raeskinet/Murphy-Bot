@@ -13,11 +13,13 @@ import { Command } from '../..';
 import { CreateGuildDto } from '../../../dtos/guild/create_guild';
 import { CreateUserDto } from '../../../dtos/user/create_user';
 import { CreateGuildMemberDto } from '../../../dtos/guild_member/create_guild_member';
+import { CreateRoleDto } from '../../../dtos/role/create_role';
 
 //Services
 import { CreateGuild } from '../../../services/guilds/create_guild';
 import { CreateUser } from '../../../services/users/create_user';
 import { CreateGuildMember } from '../../../services/guild_members/create_guild_member';
+import { CreateRole } from '../../../services/roles/create_role';
 
 export default class Fetch extends Command<void> {
   name: string = 'fetch';
@@ -45,6 +47,7 @@ export default class Fetch extends Command<void> {
 
       const guildsCollection = await this.app.client.guilds.cache;
       const guilds = Array.from(guildsCollection.values());
+
       _.each(guilds, async (guild) => {
         const createGuildDto: CreateGuildDto = {
           GuildId: guild.id,
@@ -61,7 +64,7 @@ export default class Fetch extends Command<void> {
         await this.saveGuild(createGuildDto);
 
         const membersCollection = await guild.members.fetch();
-        const members = Array.from(membersCollection.values());
+        const members = _.orderBy(Array.from(membersCollection.values()), ['joinedAt'], 'asc');
 
         _.each(members, async (member) => {
           const user = member.user;
@@ -90,6 +93,23 @@ export default class Fetch extends Command<void> {
 
           this.saveGuildMember(createGuildMemberDto);
         });
+
+        const rolesCollection = await guild.roles.fetch();
+        const roles = _.orderBy(Array.from(rolesCollection.values()), ['position'], 'desc');
+        console.log(roles);
+
+        _.each(roles, async (role) => {
+          const createRoleDto: CreateRoleDto = {
+            RoleId: role.id,
+            Name: role.name,
+            Color: role.hexColor,
+            Position: role.position,
+            CreatedAt: role.createdAt,
+            MemberRoleCount: role.members.size
+          };
+
+          await this.saveRole(createRoleDto);
+        });
       });
 
       return await interaction.reply({ ephemeral: true, content: 'ok' });
@@ -117,6 +137,14 @@ export default class Fetch extends Command<void> {
   async saveGuildMember(params: CreateGuildMemberDto) {
     try {
       const response = await new CreateGuildMember().execute(params);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async saveRole(params: CreateRoleDto) {
+    try {
+      const response = await new CreateRole().execute(params);
     } catch (error) {
       console.error(error);
     }

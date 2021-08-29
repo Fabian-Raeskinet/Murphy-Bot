@@ -10,7 +10,7 @@ export class CreateUser extends Service<CreateUserDto, boolean> {
 
       if (response.status === 200) return true;
     } catch (error) {
-      console.error('createGuild error post', error);
+      console.error('createUser error post', error);
       return false;
     }
   }
