@@ -3,7 +3,7 @@ import { Service } from '../..';
 //Models
 import { CreateRoleDto } from '../../../dtos/role/create_role';
 
-export class CreateRole extends Service<CreateRoleDto, boolean> {
+export class CreateRoleService extends Service<CreateRoleDto, boolean> {
   async execute(params: CreateRoleDto): Promise<boolean> {
     try {
       const response = await this.axios.post('/roles', params);

@@ -17,11 +17,11 @@ import { CreateRoleDto } from '../../../dtos/role/create_role';
 import { CreateCategoryChannelDto } from '../../../dtos/category_channel/create_category_channel';
 
 //Services
-import { CreateGuild } from '../../../services/guilds/create_guild';
-import { CreateUser } from '../../../services/users/create_user';
-import { CreateGuildMember } from '../../../services/guild_members/create_guild_member';
-import { CreateRole } from '../../../services/roles/create_role';
-import { CreateCategoryChannel } from '../../../services/category_channels/create_category_channel';
+import { CreateGuildService } from '../../../services/guilds/create_guild';
+import { CreateUserService } from '../../../services/users/create_user';
+import { CreateGuildMemberService } from '../../../services/guild_members/create_guild_member';
+import { CreateRoleService } from '../../../services/roles/create_role';
+import { CreateCategoryChannelService } from '../../../services/category_channels/create_category_channel';
 
 export default class Fetch extends Command<void> {
   name: string = 'fetch';
@@ -137,7 +137,7 @@ export default class Fetch extends Command<void> {
 
   async saveGuild(params: CreateGuildDto) {
     try {
-      const response = await new CreateGuild().execute(params);
+      const response = await new CreateGuildService().execute(params);
     } catch (error) {
       console.error(error);
     }
@@ -145,7 +145,7 @@ export default class Fetch extends Command<void> {
 
   async saveUser(params: CreateUserDto) {
     try {
-      const response = await new CreateUser().execute(params);
+      const response = await new CreateUserService().execute(params);
     } catch (error) {
       console.error(error);
     }
@@ -153,7 +153,7 @@ export default class Fetch extends Command<void> {
 
   async saveGuildMember(params: CreateGuildMemberDto) {
     try {
-      const response = await new CreateGuildMember().execute(params);
+      const response = await new CreateGuildMemberService().execute(params);
     } catch (error) {
       console.error(error);
     }
@@ -161,7 +161,7 @@ export default class Fetch extends Command<void> {
 
   async saveRole(params: CreateRoleDto) {
     try {
-      const response = await new CreateRole().execute(params);
+      const response = await new CreateRoleService().execute(params);
     } catch (error) {
       console.error(error);
     }
@@ -169,7 +169,7 @@ export default class Fetch extends Command<void> {
 
   async saveCategoryChannel(params: CreateCategoryChannelDto) {
     try {
-      const response = await new CreateCategoryChannel().execute(params);
+      const response = await new CreateCategoryChannelService().execute(params);
     } catch (error) {}
   }
 }

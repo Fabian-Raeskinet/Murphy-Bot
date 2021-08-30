@@ -1,11 +1,7 @@
-//Config
-import * as config from '../config';
-
 //Discord
-import { Client, ClientOptions, Intents } from 'discord.js';
+import { Client, ClientOptions } from 'discord.js';
 
 //Externals
-import axios from 'axios';
 import { readdirSync } from 'fs';
 import { join } from 'path';
 

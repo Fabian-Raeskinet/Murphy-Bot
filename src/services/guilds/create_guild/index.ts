@@ -3,7 +3,7 @@ import { Service } from '../..';
 //Models
 import { CreateGuildDto } from '../../../dtos/guild/create_guild';
 
-export class CreateGuild extends Service<CreateGuildDto, boolean> {
+export class CreateGuildService extends Service<CreateGuildDto, boolean> {
   async execute(params: CreateGuildDto): Promise<boolean> {
     try {
       const response = await this.axios.post('/guilds', params);
