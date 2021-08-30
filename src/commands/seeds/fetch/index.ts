@@ -2,7 +2,7 @@
 import { DiscordApp } from '../../../app';
 
 //Discord
-import { Interaction, InteractionReplyOptions } from 'discord.js';
+import { CategoryChannel, Guild, GuildMember, Interaction, InteractionReplyOptions, Role, User } from 'discord.js';
 
 //Externals
 import * as _ from 'lodash';
@@ -51,81 +51,29 @@ export default class Fetch extends Command<void> {
       const guilds = Array.from(guildsCollection.values());
 
       _.each(guilds, async (guild) => {
-        const createGuildDto: CreateGuildDto = {
-          GuildId: guild.id,
-          Name: guild.name,
-          Icon: guild.icon,
-          Banner: guild.banner,
-          Description: guild.description,
-          OwnerId: guild.ownerId,
-          CreatedAt: guild.createdAt,
-          IsAvailable: true,
-          AfkChannelId: guild.afkChannelId,
-          MemberCount: guild.memberCount
-        };
-        await this.saveGuild(createGuildDto);
+        await this.saveGuild(guild);
 
         const membersCollection = await guild.members.fetch();
         const members = _.orderBy(Array.from(membersCollection.values()), ['joinedAt'], 'asc');
 
         _.each(members, async (member) => {
           const user = member.user;
-
-          const createUserDto: CreateUserDto = {
-            UserId: user.id,
-            UserName: user.username,
-            Tag: user.tag,
-            Avatar: user.avatar,
-            CreatedAt: user.createdAt,
-            IsBot: user.bot
-          };
-          await this.saveUser(createUserDto);
-
-          const createGuildMemberDto: CreateGuildMemberDto = {
-            GuildMemberId: uuid(),
-            UserId: user.id,
-            GuildId: guild.id,
-            Nickname: member.nickname,
-            JoinedAt: member.joinedAt,
-            IsAdmin: member.permissions.has('ADMINISTRATOR'),
-            IsAvailable: true,
-            IsBanned: false,
-            IsKicked: false
-          };
-
-          this.saveGuildMember(createGuildMemberDto);
+          await this.saveUser(user);
+          await this.saveGuildMember(member);
         });
 
         const rolesCollection = await guild.roles.fetch();
         const roles = _.orderBy(Array.from(rolesCollection.values()), ['position'], 'desc');
 
         _.each(roles, async (role) => {
-          const createRoleDto: CreateRoleDto = {
-            RoleId: role.id,
-            Name: role.name,
-            Color: role.hexColor,
-            Position: role.position,
-            CreatedAt: role.createdAt,
-            MemberRoleCount: role.members.size,
-            GuildId: guild.id
-          };
-
-          await this.saveRole(createRoleDto);
+          await this.saveRole(role);
         });
 
         const channelsCollection = await guild.channels.fetch();
         const categoryChannels = _.filter(Array.from(channelsCollection.values()), (c) => c.type === 'GUILD_CATEGORY');
 
         _.each(categoryChannels, (categoryChannel) => {
-          const createCategoryChannelDto: CreateCategoryChannelDto = {
-            CategoryChannelId: categoryChannel.id,
-            Name: categoryChannel.name,
-            Position: categoryChannel.position,
-            CreatedAt: categoryChannel.createdAt,
-            GuildId: guild.id
-          };
-
-          this.saveCategoryChannel(createCategoryChannelDto);
+          this.saveCategoryChannel(categoryChannel as CategoryChannel);
         });
       });
 
@@ -135,41 +83,88 @@ export default class Fetch extends Command<void> {
     }
   }
 
-  async saveGuild(params: CreateGuildDto) {
+  async saveGuild(guild: Guild) {
     try {
-      const response = await new CreateGuildService().execute(params);
+      const createGuildDto: CreateGuildDto = {
+        GuildId: guild.id,
+        Name: guild.name,
+        Icon: guild.icon,
+        Banner: guild.banner,
+        Description: guild.description,
+        OwnerId: guild.ownerId,
+        CreatedAt: guild.createdAt,
+        IsAvailable: true,
+        AfkChannelId: guild.afkChannelId,
+        MemberCount: guild.memberCount
+      };
+      const response = await new CreateGuildService().execute(createGuildDto);
     } catch (error) {
       console.error(error);
     }
   }
 
-  async saveUser(params: CreateUserDto) {
+  async saveUser(user: User) {
     try {
-      const response = await new CreateUserService().execute(params);
+      const createUserDto: CreateUserDto = {
+        UserId: user.id,
+        UserName: user.username,
+        Tag: user.tag,
+        Avatar: user.avatar,
+        CreatedAt: user.createdAt,
+        IsBot: user.bot
+      };
+      const response = await new CreateUserService().execute(createUserDto);
     } catch (error) {
       console.error(error);
     }
   }
 
-  async saveGuildMember(params: CreateGuildMemberDto) {
+  async saveGuildMember(member: GuildMember) {
     try {
-      const response = await new CreateGuildMemberService().execute(params);
+      const createGuildMemberDto: CreateGuildMemberDto = {
+        GuildMemberId: uuid(),
+        UserId: member.user.id,
+        GuildId: member.guild.id,
+        Nickname: member.nickname,
+        JoinedAt: member.joinedAt,
+        IsAdmin: member.permissions.has('ADMINISTRATOR'),
+        IsAvailable: true,
+        IsBanned: false,
+        IsKicked: false
+      };
+      const response = await new CreateGuildMemberService().execute(createGuildMemberDto);
     } catch (error) {
       console.error(error);
     }
   }
 
-  async saveRole(params: CreateRoleDto) {
+  async saveRole(role: Role) {
     try {
-      const response = await new CreateRoleService().execute(params);
+      const createRoleDto: CreateRoleDto = {
+        RoleId: role.id,
+        Name: role.name,
+        Color: role.hexColor,
+        Position: role.position,
+        CreatedAt: role.createdAt,
+        MemberRoleCount: role.members.size,
+        GuildId: role.guild.id
+      };
+      const response = await new CreateRoleService().execute(createRoleDto);
     } catch (error) {
       console.error(error);
     }
   }
 
-  async saveCategoryChannel(params: CreateCategoryChannelDto) {
+  async saveCategoryChannel(categoryChannel: CategoryChannel) {
     try {
-      const response = await new CreateCategoryChannelService().execute(params);
+      const createCategoryChannelDto: CreateCategoryChannelDto = {
+        CategoryChannelId: categoryChannel.id,
+        Name: categoryChannel.name,
+        Position: categoryChannel.position,
+        CreatedAt: categoryChannel.createdAt,
+        GuildId: categoryChannel.guild.id
+      };
+      const response = await new CreateCategoryChannelService().execute(createCategoryChannelDto);
     } catch (error) {}
   }
 }
