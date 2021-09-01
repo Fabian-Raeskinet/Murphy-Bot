@@ -2,7 +2,16 @@
 import { DiscordApp } from '../../../app';
 
 //Discord
-import { CategoryChannel, Guild, GuildMember, Interaction, InteractionReplyOptions, Role, User } from 'discord.js';
+import {
+  CategoryChannel,
+  Guild,
+  GuildMember,
+  Interaction,
+  InteractionReplyOptions,
+  Role,
+  TextChannel,
+  User
+} from 'discord.js';
 
 //Externals
 import * as _ from 'lodash';
@@ -22,6 +31,9 @@ import { CreateUserService } from '../../../services/users/create_user';
 import { CreateGuildMemberService } from '../../../services/guild_members/create_guild_member';
 import { CreateRoleService } from '../../../services/roles/create_role';
 import { CreateCategoryChannelService } from '../../../services/category_channels/create_category_channel';
+import { CreateTextChannelDto } from '../../../dtos/text_channel/create_text_channel';
+import { CreateTextChannelService } from '../../../services/text_channels/create_text_channel';
+import { DeleteDataService } from '../../../services/seeds/delete_data';
 
 export default class Fetch extends Command<void> {
   name: string = 'fetch';
@@ -47,40 +59,56 @@ export default class Fetch extends Command<void> {
         return await interaction.reply(response);
       }
 
+      await interaction.reply({ ephemeral: true, content: 'ok' });
+
+      await this.deleteData();
+
       const guildsCollection = await this.app.client.guilds.cache;
       const guilds = Array.from(guildsCollection.values());
 
-      _.each(guilds, async (guild) => {
+      for (const guild of guilds) {
         await this.saveGuild(guild);
 
         const membersCollection = await guild.members.fetch();
         const members = _.orderBy(Array.from(membersCollection.values()), ['joinedAt'], 'asc');
 
-        _.each(members, async (member) => {
+        for (const member of members) {
           const user = member.user;
           await this.saveUser(user);
           await this.saveGuildMember(member);
-        });
+        }
 
         const rolesCollection = await guild.roles.fetch();
         const roles = _.orderBy(Array.from(rolesCollection.values()), ['position'], 'desc');
 
-        _.each(roles, async (role) => {
+        for (const role of roles) {
           await this.saveRole(role);
-        });
+        }
 
         const channelsCollection = await guild.channels.fetch();
         const categoryChannels = _.filter(Array.from(channelsCollection.values()), (c) => c.type === 'GUILD_CATEGORY');
 
-        _.each(categoryChannels, (categoryChannel) => {
-          this.saveCategoryChannel(categoryChannel as CategoryChannel);
-        });
-      });
+        for (const categoryChannel of categoryChannels) {
+          await this.saveCategoryChannel(categoryChannel as CategoryChannel);
+        }
 
-      return await interaction.reply({ ephemeral: true, content: 'ok' });
+        const textChannels = _.filter(Array.from(channelsCollection.values()), (c) => c.type === 'GUILD_TEXT');
+
+        for (const textChannel of textChannels) {
+          await this.saveTextChannel(textChannel as TextChannel);
+        }
+      }
+
+      return console.log('ok');
     } catch (error) {
       console.error('fetch error', error);
     }
+  }
+
+  async deleteData() {
+    try {
+      const response = await new DeleteDataService().execute(true);
+    } catch (error) {}
   }
 
   async saveGuild(guild: Guild) {
@@ -165,6 +193,25 @@ export default class Fetch extends Command<void> {
         GuildId: categoryChannel.guild.id
       };
       const response = await new CreateCategoryChannelService().execute(createCategoryChannelDto);
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async saveTextChannel(textChannel: TextChannel) {
+    try {
+      const createTextChannelDto: CreateTextChannelDto = {
+        TextChannelId: textChannel.id,
+        Name: textChannel.name,
+        Position: textChannel.position,
+        CreatedAt: textChannel.createdAt,
+        IsNsfw: textChannel.nsfw,
+        CategoryChannelId: textChannel.parentId,
+        GuildId: textChannel.guild.id
+      };
+      const response = await new CreateTextChannelService().execute(createTextChannelDto);
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
